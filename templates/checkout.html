@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<h1>Checkout</h1>
+
+<h2>Shipping Information</h2>
+<form method="POST">
+    <input type="text" name="full_name" placeholder="Full Name" required>
+    <input type="text" name="address" placeholder="Address" required>
+    <input type="text" name="city" placeholder="City" required>
+    <input type="text" name="zipcode" placeholder="ZIP Code" required>
+
+    <h2>Order Summary</h2>
+
+    <ul>
+    {% for item in items %}
+        <li>{{ item.product.name }} x {{ item.quantity }}</li>
+    {% endfor %}
+    </ul>
+
+    <p>Subtotal: ${{ "%.2f"|format(subtotal) }}</p>
+    <p>Shipping: ${{ "%.2f"|format(shipping) }}</p>
+    <h3>Total: ${{ "%.2f"|format(total) }}</h3>
+
+    <button type="submit">Place Order</button>
+</form>
+
+</body>
+</html>

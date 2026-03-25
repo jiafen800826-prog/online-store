@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Online Store</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>My Online Store</h1>
+        <nav>
+            {% if current_user.is_authenticated %}
+                <span>Hello, {{ current_user.username }}!</span>
+                <a href="{{ url_for('cart') }}">Cart</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a> |
+                <a href="{{ url_for('register') }}">Register</a>
+            {% endif %}
+            {% if current_user.is_authenticated and current_user.username == "admin" %}
+                | <a href="{{ url_for('admin') }}">Admin Panel</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <!-- Featured Carousel -->
+    {% if products %}
+    <div class="carousel-container">
+        <div class="carousel-slide">
+            {% for featured in products[:5] %} <!-- show up to 5 featured products -->
+            <div class="carousel-item">
+                {% if featured.image_url %}
+                <img src="{{ featured.image_url }}" alt="{{ featured.name }}">
+                {% endif %}
+                <div class="carousel-text">
+                    {% if featured.is_featured %}
+                        <span class="badge">FEATURED</span>
+                    {% endif %}
+                    <h2>{{ featured.name }}</h2>
+                    {% if featured.discount > 0 %}
+                        <p>
+                            <span class="old-price">${{ "%.2f"|format(featured.price) }}</span>
+                            <span class="discounted-price">
+                                ${{ "%.2f"|format(featured.price * (1 - featured.discount/100)) }}
+                            </span>
+                        </p>
+                    {% else %}
+                        <p>${{ "%.2f"|format(featured.price) }}</p>
+                    {% endif %}
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('add_to_cart', product_id=featured.id) }}">
+                            <button>Add to Cart</button>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <button class="prev">&#10094;</button>
+        <button class="next">&#10095;</button>
+    </div>
+    {% endif %}
+
+    <!-- Product Grid -->
+    <h2>All Products</h2>
+    <div class="product-grid">
+        {% for product in products %}
+        <div class="product-card">
+            {% if product.image_url %}
+            <img src="{{ product.image_url }}" alt="{{ product.name }}">
+            {% endif %}
+            {% if product.is_featured %}
+                <span class="badge-grid">FEATURED</span>
+            {% endif %}
+            <h3>{{ product.name }}</h3>
+            {% if product.discount > 0 %}
+                <p>
+                    <span class="old-price">${{ "%.2f"|format(product.price) }}</span>
+                    <span class="discounted-price">
+                        ${{ "%.2f"|format(product.price * (1 - product.discount/100)) }}
+                    </span>
+                </p>
+            {% else %}
+                <p>${{ "%.2f"|format(product.price) }}</p>
+            {% endif %}
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('add_to_cart', product_id=product.id) }}">
+                    <button>Add to Cart</button>
+                </a>
+                <a href="{{ url_for('orders') }}">My Orders</a>
+            {% else %}
+                <p>Login to add to cart</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Carousel JS -->
+    <script>
+        let slideIndex = 0;
+        const slides = document.querySelectorAll('.carousel-item');
+        const totalSlides = slides.length;
+        const prevBtn = document.querySelector('.prev');
+        const nextBtn = document.querySelector('.next');
+
+        function showSlide(index) {
+            if (slides.length === 0) return;
+            const slideWidth = slides[0].clientWidth;
+            const slideContainer = document.querySelector('.carousel-slide');
+            slideContainer.style.transform = 'translateX(' + (-slideWidth * index) + 'px)';
+        }
+
+        function nextSlide() {
+            slideIndex = (slideIndex + 1) % totalSlides;
+            showSlide(slideIndex);
+        }
+
+        function prevSlide() {
+            slideIndex = (slideIndex - 1 + totalSlides) % totalSlides;
+            showSlide(slideIndex);
+        }
+
+        if (nextBtn && prevBtn) {
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+        }
+
+        // Auto-slide every 5 seconds
+        setInterval(nextSlide, 5000);
+    </script>
+    <form method="GET" action="{{ url_for('index') }}">
+    <input type="text" name="search" placeholder="Search products...">
+    <button type="submit">Search</button>
+</form>
+</body>
+</html>

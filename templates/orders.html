@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Orders</title>
+</head>
+<body>
+
+<h1>My Orders</h1>
+
+{% for order in orders %}
+    <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+        <p><strong>Order ID:</strong> {{ order.id }}</p>
+        <p><strong>Total:</strong> ${{ order.total_amount }}</p>
+        <p><strong>Shipping:</strong> {{ order.address }}</p>
+    </div>
+{% endfor %}
+
+<a href="{{ url_for('index') }}">Back to Shop</a>
+
+</body>
+</html>

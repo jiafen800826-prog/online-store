@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Product</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header>
+    <h1>Edit Product</h1>
+    <a href="{{ url_for('admin') }}">Back to Admin</a>
+</header>
+
+<form method="POST" enctype="multipart/form-data">
+    <input type="text" name="name" value="{{ product.name }}" required>
+    <input type="text" name="description" value="{{ product.description }}">
+    <input type="number" step="0.01" name="price" value="{{ product.price }}" required>
+
+    <label>
+        <input type="checkbox" name="is_featured"
+        {% if product.is_featured %}checked{% endif %}>
+        Featured
+    </label>
+
+    <input type="number" step="0.01" name="discount"
+           value="{{ product.discount }}" min="0" max="100">
+
+    <p>Current Image:</p>
+    {% if product.image_url %}
+        <img src="{{ product.image_url }}" width="150">
+    {% endif %}
+
+    <input type="file" name="image_file">
+
+    <button type="submit">Update Product</button>
+</form>
+
+</body>
+</html>

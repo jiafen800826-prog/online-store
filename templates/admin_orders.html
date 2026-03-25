@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Orders</title>
+</head>
+<body>
+
+<h1>All Orders</h1>
+
+{% for order in orders %}
+    <div style="border:1px solid black; margin:10px; padding:10px;">
+        <p><strong>Order ID:</strong> {{ order.id }}</p>
+        <p>User ID: {{ order.user_id }}</p>
+        <p>Name: {{ order.full_name }}</p>
+        <p>Address: {{ order.address }}</p>
+        <p>Total: ${{ order.total_amount }}</p>
+        <p>Status: {{ order.status }}</p>
+
+<a href="{{ url_for('update_order_status', order_id=order.id, status='Shipped') }}">
+    <button>Mark Shipped</button>
+</a>
+
+<a href="{{ url_for('update_order_status', order_id=order.id, status='Delivered') }}">
+    <button>Mark Delivered</button>
+</a>
+    </div>
+{% endfor %}
+
+</body>
+</html>

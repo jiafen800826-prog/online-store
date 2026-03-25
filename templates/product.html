@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ product.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <a href="{{ url_for('index') }}">Back to Home</a>
+
+    {% if product.image_url %}
+    <img src="{{ product.image_url }}" alt="{{ product.name }}">
+    {% endif %}
+
+    <h1>{{ product.name }}</h1>
+    <p>{{ product.description }}</p>
+    <p>Price: ${{ "%.2f"|format(product.price) }}</p>
+
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('add_to_cart', product_id=product.id) }}">
+        <button>Add to Cart</button>
+    </a>
+    {% else %}
+    <p><a href="{{ url_for('login') }}">Login</a> to add to cart.</p>
+    {% endif %}
+</body>
+</html>

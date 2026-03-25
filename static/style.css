@@ -1,0 +1,325 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #1e90ff;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+li {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 15px;
+    width: 250px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+li:hover {
+    transform: scale(1.05);
+}
+
+img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+button {
+    background-color: #1e90ff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-top: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0073e6;
+}
+
+input {
+    padding: 8px;
+    margin: 5px 0;
+    width: 200px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+@media (max-width: 600px) {
+    li {
+        width: 90%;
+    }
+}
+
+/* Featured Banner */
+.featured-banner {
+    position: relative;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 1000px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 6px 10px rgba(0,0,0,0.2);
+}
+
+.featured-banner img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+}
+
+.banner-text {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.banner-text h2 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.banner-text p {
+    margin: 5px 0;
+    font-size: 20px;
+}
+
+.banner-text button {
+    padding: 8px 12px;
+    font-size: 16px;
+}
+
+@media (max-width: 600px) {
+    .featured-banner img {
+        height: 250px;
+    }
+    .banner-text h2 {
+        font-size: 20px;
+    }
+    .banner-text p {
+        font-size: 16px;
+    }
+}
+
+/* Carousel Container */
+.carousel-container {
+    position: relative;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 1000px;
+    overflow: hidden;
+    border-radius: 15px;
+    box-shadow: 0 6px 10px rgba(0,0,0,0.2);
+}
+
+/* Slide Track */
+.carousel-slide {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+/* Each Item */
+.carousel-item {
+    min-width: 100%;
+    position: relative;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+}
+
+.carousel-text {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.carousel-text h2 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.carousel-text p {
+    margin: 5px 0;
+    font-size: 20px;
+}
+
+.carousel-text button {
+    padding: 8px 12px;
+    font-size: 16px;
+}
+
+/* Carousel buttons */
+.prev, .next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0,0,0,0.4);
+    color: white;
+    border: none;
+    font-size: 30px;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.prev { left: 10px; }
+.next { right: 10px; }
+
+.prev:hover, .next:hover {
+    background-color: rgba(0,0,0,0.7);
+}
+
+@media (max-width: 600px) {
+    .carousel-item img {
+        height: 250px;
+    }
+    .carousel-text h2 { font-size: 20px; }
+    .carousel-text p { font-size: 16px; }
+}
+
+/* Product Grid */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.product-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+}
+
+.product-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.product-card button {
+    background-color: #1e90ff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-top: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.product-card button:hover {
+    background-color: #0073e6;
+}
+
+@media (max-width: 600px) {
+    .product-card img {
+        height: 150px;
+    }
+}
+
+/* Featured badge */
+.badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: #ff4500;
+    color: white;
+    padding: 5px 10px;
+    font-weight: bold;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Discounted price */
+.old-price {
+    text-decoration: line-through;
+    color: #bbb;
+    margin-right: 10px;
+}
+
+.discounted-price {
+    color: #ff4500;
+    font-weight: bold;
+}
+
+/* Badge for product grid */
+.badge-grid {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #ff4500;
+    color: white;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 3px;
+}
+
+/* Make product card position relative for badge */
+.product-card {
+    position: relative;  /* needed for badge positioning */
+}
