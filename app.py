@@ -11,7 +11,10 @@ from models import db, Product, CartItem, User, Order, OrderItem
 # ---------------- Flask App ----------------
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///store.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    'DATABASE_URL',
+    'sqlite:///store.db'
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your-secret-key'
 
@@ -62,7 +65,11 @@ def index():
     else:
         products = Product.query.all()
 
-    return render_template('index.html', products=products)
+    # ✅ GET UNIQUE CATEGORIES
+    categories = db.session.query(Product.category).distinct().all()
+    categories = [c[0] for c in categories if c[0]]
+
+    return render_template('index.html', products=products, categories=categories)
 
 # ---------------- Auth ----------------
 @app.route('/register', methods=['GET', 'POST'])

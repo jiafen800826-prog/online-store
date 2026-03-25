@@ -58,6 +58,27 @@
         <button class="prev">&#10094;</button>
         <button class="next">&#10095;</button>
     </div>
+    <div style="display:flex;"></div>
+    <div style="width:200px; padding:20px; background:#f4f4f4;">
+    <h3>Categories</h3>
+
+    <ul style="list-style:none; padding:0;">
+        <li>
+            <a href="{{ url_for('index') }}">All</a>
+        </li>
+
+        {% for cat in categories %}
+        <li>
+            <a href="{{ url_for('index', category=cat) }}">
+                {{ cat }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<div style="flex:1;">
+    <!-- your existing product grid here -->
+</div>
     {% endif %}
 
     <!-- Product Grid -->
