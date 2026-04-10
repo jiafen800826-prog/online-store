@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Detail</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<h1>Order #{{ order.id }}</h1>
+
+<p><strong>Status:</strong> {{ order.status }}</p>
+<p><strong>Total:</strong> ${{ "%.2f"|format(order.total_amount or 0) }}</p>
+<p><strong>Date:</strong>
+    {{ order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else 'N/A' }}
+</p>
+
+<div style="margin:20px 0;">
+    <div style="display:flex; gap:10px; align-items:center;">
+
+        <div style="padding:10px; border-radius:5px; background:{% if order.status in ['Pending', 'Paid', 'Shipped', 'Delivered'] %}lightgreen{% else %}#ddd{% endif %};">
+            Pending
+        </div>
+
+        <div style="padding:10px; border-radius:5px; background:{% if order.status in ['Paid', 'Shipped', 'Delivered'] %}lightgreen{% else %}#ddd{% endif %};">
+            Paid
+        </div>
+
+        <div style="padding:10px; border-radius:5px; background:{% if order.status in ['Shipped', 'Delivered'] %}lightgreen{% else %}#ddd{% endif %};">
+            Shipped
+        </div>
+
+        <div style="padding:10px; border-radius:5px; background:{% if order.status == 'Delivered' %}lightgreen{% else %}#ddd{% endif %};">
+            Delivered
+        </div>
+
+        {% if order.status == 'Cancelled' %}
+        <div style="padding:10px; border-radius:5px; background:tomato; color:white;">
+            Cancelled
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if order.status == 'Pending' %}
+    <p style="color:orange;"><strong>Your order is being prepared.</strong></p>
+{% elif order.status == 'Paid' %}
+    <p style="color:blue;"><strong>Your payment was received.</strong></p>
+{% elif order.status == 'Shipped' %}
+    <p style="color:purple;"><strong>Your order has been shipped.</strong></p>
+{% elif order.status == 'Delivered' %}
+    <p style="color:green;"><strong>Your order was delivered.</strong></p>
+{% elif order.status == 'Cancelled' %}
+    <p style="color:red;"><strong>Your order was cancelled.</strong></p>
+{% endif %}
+
+
+
+<h2>Items</h2>
+
+{% if order.items %}
+    <ul>
+        {% for item in order.items %}
+            <li>
+                {{ item.product_name_snapshot or (item.product.name if item.product else "Deleted Product") }}
+                — Quantity: {{ item.quantity }}
+                — ${{ "%.2f"|format(item.price_at_purchase or 0) }} each
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No items found for this order.</p>
+{% endif %}
+
+<a href="{{ url_for('my_orders') }}">← Back to My Orders</a>
+
+{% if order.cancel_requested %}
+    <div style="margin-top:20px; padding:12px; border:1px solid #f0caca; background:#fff8f8; border-radius:8px;">
+        <h3>Cancellation Request</h3>
+        <p><strong>Reason:</strong> {{ order.cancel_reason }}</p>
+        <p><strong>Status:</strong> {{ order.cancel_status }}</p>
+    </div>
+
+{% elif order.cancel_status == "Rejected" %}
+    <div style="margin-top:20px; padding:12px; border:1px solid #ddd; background:#f9f9f9; border-radius:8px;">
+        <h3>Cancellation Request</h3>
+        <p><strong>Status:</strong> Rejected</p>
+    </div>
+
+{% elif order.cancel_status == "Approved" or order.status == "Cancelled" %}
+    <div style="margin-top:20px; padding:12px; border:1px solid #f0caca; background:#fff8f8; border-radius:8px;">
+        <h3>Cancellation Request</h3>
+        <p><strong>Status:</strong> Approved</p>
+    </div>
+
+{% elif order.status in ['Pending', 'Paid'] and order.user_id == current_user.id %}
+    <div style="margin-top:20px;">
+        <h3>Request Cancellation</h3>
+        <form action="{{ url_for('request_order_cancel', order_id=order.id) }}" method="POST">
+            <input type="text" name="cancel_reason" placeholder="Reason for cancellation" required>
+            <button type="submit">Request Cancel</button>
+        </form>
+    </div>
+{% endif %}
+
+<h3>Shipping Info</h3>
+<p><strong>Carrier:</strong> {{ order.shipping_carrier or 'Not assigned' }}</p>
+<p><strong>Tracking Number:</strong> {{ order.tracking_number or 'Not available yet' }}</p>
+<p><strong>Shipping Status:</strong> {{ order.shipping_status or 'Not shipped' }}</p>
+
+{% if order.return_requested %}
+    <p><strong>Return Requested</strong></p>
+    <p>Reason: {{ order.return_reason }}</p>
+    <p>Status: {{ order.return_status }}</p>
+{% endif %}
+
+{% if order.status == 'Delivered' and order.user_id == current_user.id %}
+    <h3>Request Return</h3>
+    <form action="{{ url_for('request_return', order_id=order.id) }}" method="POST">
+        <input type="text" name="return_reason" placeholder="Reason for return">
+        <button type="submit">Request Return</button>
+    </form>
+{% endif %}
+
+{% if order.return_label_url %}
+    <p><a href="{{ order.return_label_url }}" target="_blank">Download Return Label</a></p>
+{% endif %}
+
+
+</body>
+</html>

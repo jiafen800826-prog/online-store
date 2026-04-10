@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="dashboard">
+    <div class="top-nav">
+        <a href="{{ url_for('index') }}">🏠 Home</a>
+    </div>
+
+    <nav>
+        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('admin_products') }}">Products</a>
+        <a href="{{ url_for('admin_orders') }}">Orders</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+        <a href="{{ url_for('admin_create_user') }}">Users</a>
+    </nav>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <h1>📊 Admin Dashboard</h1>
+
+    <div class="cards">
+        <div class="card">
+            <h3>Products</h3>
+            <h2>{{ total_products }}</h2>
+        </div>
+        <div class="card">
+            <h3>Orders</h3>
+            <h2>{{ total_orders }}</h2>
+        </div>
+        <div class="card">
+            <h3>Users</h3>
+            <h2>{{ total_users }}</h2>
+        </div>
+        <div class="card">
+            <h3>Revenue</h3>
+            <h2>${{ "%.2f"|format(total_revenue or 0) }}</h2>
+        </div>
+    </div>
+
+    <h2>🕒 Recent Orders</h2>
+    {% if recent_orders %}
+        {% for order in recent_orders %}
+            <div class="order-box">
+                <p><strong>Order #{{ order.id }}</strong></p>
+                <p>Total: ${{ "%.2f"|format(order.total_amount or 0) }}</p>
+                <p>Status: {{ order.status }}</p>
+                <p>Date: {{ order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else 'N/A' }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No orders yet.</p>
+    {% endif %}
+
+    <h2>⚠ Low Stock Products</h2>
+    {% if low_stock_products %}
+        <ul>
+            {% for product in low_stock_products %}
+                <li>{{ product.name }} — only {{ product.stock }} left</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No low stock alerts.</p>
+    {% endif %}
+
+    <h2 style="text-align:center;">📈 Sales Analytics</h2>
+
+    <canvas id="ordersChart"></canvas>
+    <br><br>
+    <canvas id="revenueChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const dates = {{ dates|tojson }};
+const orderCounts = {{ order_counts|tojson }};
+const revenueData = {{ revenue_data|tojson }};
+
+if (dates.length > 0) {
+    const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+    new Chart(ordersCtx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Orders',
+                data: orderCounts,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true
+        }
+    });
+
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+        type: 'bar',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Revenue',
+                data: revenueData,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true
+        }
+    });
+}
+</script>
+
+</body>
+</html>

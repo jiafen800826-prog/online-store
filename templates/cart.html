@@ -6,6 +6,16 @@
 </head>
 <body>
 
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
 <h1>Your Cart</h1>
 
 {% if current_user.is_authenticated %}
@@ -17,30 +27,37 @@
                 <li>
                     {{ item.quantity }} x {{ item.product.name }} -
                     ${{ "%.2f"|format(item.product.price * item.quantity) }}
+
+                    {% if item.product.discount > 0 %}
+                        <span style="color:red;">(Discount Applied)</span>
+                    {% endif %}
+
+                    <form action="{{ url_for('update_cart', item_id=item.id) }}" method="POST" style="display:inline;">
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}">
+                        <button type="submit">Update</button>
+                    </form>
+
+                    <form action="{{ url_for('remove_from_cart', item_id=item.id) }}" method="POST" style="display:inline;">
+                        <button type="submit">Remove</button>
+                    </form>
                 </li>
             {% endfor %}
         </ul>
 
-        <p>Subtotal: ${{ "%.2f"|format(subtotal) }}</p>
-        <p>Shipping: ${{ "%.2f"|format(shipping) }}</p>
-        <h3>Total: ${{ "%.2f"|format(total) }}</h3>
+        <p><strong>Subtotal:</strong> ${{ "%.2f"|format(subtotal) }}</p>
+        <p><strong>Shipping:</strong> ${{ "%.2f"|format(shipping) }}</p>
+        <h3><strong>Total:</strong> ${{ "%.2f"|format(total) }}</h3>
 
-        <!-- Stripe Checkout -->
         <form method="POST" action="{{ url_for('checkout') }}">
-            <button type="submit">Pay with Stripe</button>
+            <button type="submit" class="btn">Pay with Stripe</button>
         </form>
-
-        <!-- New Checkout Page (Address + Order Save) -->
-        <a href="{{ url_for('checkout_page') }}">
-            <button>Proceed to Checkout</button>
-        </a>
 
     {% else %}
         <p>Your cart is empty.</p>
     {% endif %}
 
     <br>
-    <a href="{{ url_for('index') }}">Continue Shopping</a>
+    <a href="{{ url_for('index') }}">← Continue Shopping</a>
 
 {% else %}
     <p>You must <a href="{{ url_for('login') }}">login</a> to view your cart.</p>

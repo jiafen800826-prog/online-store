@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Wishlist</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<h1>My Wishlist</h1>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+{% if items %}
+    {% for item in items %}
+        <div style="border:1px solid #ccc; padding:15px; margin-bottom:15px;">
+            <h3>{{ item.product.name }}</h3>
+
+            {% if item.product.image_url %}
+                <img src="{{ item.product.image_url }}" width="150">
+            {% endif %}
+
+            <p>${{ "%.2f"|format(item.product.price) }}</p>
+
+            <a href="{{ url_for('product_detail', product_id=item.product.id) }}">View Product</a>
+            <a href="{{ url_for('add_to_cart', product_id=item.product.id) }}">
+                <button type="button">Add to Cart</button>
+            </a>
+
+            <form action="{{ url_for('remove_from_wishlist', item_id=item.id) }}" method="POST" style="display:inline;">
+                <button type="submit">Remove</button>
+            </form>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Your wishlist is empty.</p>
+{% endif %}
+
+<a href="{{ url_for('index') }}">← Back to Home</a>
+
+</body>
+</html>

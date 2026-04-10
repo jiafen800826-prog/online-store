@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Success</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<h1>Payment Successful</h1>
+<p>Thank you for your purchase.</p>
+<p>Your order is being processed. It may take a few seconds to appear.</p>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+{% if session_id %}
+    <a href="{{ url_for('order_success', session_id=session_id) }}">
+        <button type="button">View My Order</button>
+    </a>
+{% endif %}
+
+<a href="{{ url_for('my_orders') }}">
+    <button type="button">Go to My Orders</button>
+</a>
+
+<a href="{{ url_for('index') }}">
+    <button type="button">Back to Home</button>
+</a>
+
+</body>
+</html>

@@ -2,29 +2,106 @@
 <html>
 <head>
     <title>Admin Orders</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<h1>All Orders</h1>
+<header>
+    <h1>Admin Orders</h1>
+    <nav>
+        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('admin_products') }}">Products</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+</header>
 
-{% for order in orders %}
-    <div style="border:1px solid black; margin:10px; padding:10px;">
-        <p><strong>Order ID:</strong> {{ order.id }}</p>
-        <p>User ID: {{ order.user_id }}</p>
-        <p>Name: {{ order.full_name }}</p>
-        <p>Address: {{ order.address }}</p>
-        <p>Total: ${{ order.total_amount }}</p>
-        <p>Status: {{ order.status }}</p>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
 
-<a href="{{ url_for('update_order_status', order_id=order.id, status='Shipped') }}">
-    <button>Mark Shipped</button>
-</a>
+<h2>All Orders</h2>
 
-<a href="{{ url_for('update_order_status', order_id=order.id, status='Delivered') }}">
-    <button>Mark Delivered</button>
-</a>
+{% if orders %}
+    {% for order in orders %}
+        <div style="border:1px solid #ccc; padding:15px; margin-bottom:20px; border-radius:8px;">
+            <h3>Order #{{ order.id }}</h3>
+            <p><strong>User:</strong> {{ order.user.username if order.user else 'Guest' }}</p>
+            <p><strong>Total:</strong> ${{ "%.2f"|format(order.total_amount or 0) }}</p>
+            <p><strong>Current Status:</strong> {{ order.status }}</p>
+            <p><strong>Date:</strong> {{ order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else 'N/A' }}</p>
+
+            <form action="{{ url_for('update_order_status', order_id=order.id) }}" method="POST">
+                <label for="status-{{ order.id }}">Change Status:</label>
+                <select name="status" id="status-{{ order.id }}">
+                    <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Paid" {% if order.status == 'Paid' %}selected{% endif %}>Paid</option>
+                    <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                    <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                    <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+                <button type="submit">Update</button>
+            </form>
+
+            {% if order.cancel_requested %}
+                <p style="color:red;"><strong>Cancellation Requested</strong></p>
+                <p>Reason: {{ order.cancel_reason }}</p>
+            {% endif %}
+
+            <form action="{{ url_for('update_shipping', order_id=order.id) }}" method="POST">
+                <input type="text" name="shipping_carrier" placeholder="Carrier" value="{{ order.shipping_carrier or '' }}">
+                <input type="text" name="tracking_number" placeholder="Tracking Number" value="{{ order.tracking_number or '' }}">
+
+                <select name="shipping_status">
+                    <option value="Not shipped" {% if order.shipping_status == 'Not shipped' %}selected{% endif %}>Not shipped</option>
+                    <option value="Shipped" {% if order.shipping_status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                    <option value="Delivered" {% if order.shipping_status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                </select>
+
+                <button type="submit">Update Shipping</button>
+            </form>
+
+            <h4>Items</h4>
+            {% if order.items %}
+                <ul>
+                    {% for item in order.items %}
+                        <li>
+                            {{ item.product_name_snapshot or item.product.name }} —
+                            Quantity: {{ item.quantity }} —
+                            ${{ "%.2f"|format(item.price_at_purchase or 0) }} each
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No items in this order.</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+    {% if order.cancel_requested %}
+    <div style="margin-top:15px; padding:10px; border:1px solid #f0bcbc; background:#fff5f5; border-radius:6px;">
+        <p style="color:red;"><strong>Cancellation Requested</strong></p>
+        <p><strong>Reason:</strong> {{ order.cancel_reason }}</p>
+        <p><strong>Request Status:</strong> {{ order.cancel_status }}</p>
+
+        {% if order.cancel_status == "Pending" %}
+            <form action="{{ url_for('approve_cancel', order_id=order.id) }}" method="POST" style="display:inline;">
+                <button type="submit">Approve Cancellation</button>
+            </form>
+
+            <form action="{{ url_for('reject_cancel', order_id=order.id) }}" method="POST" style="display:inline; margin-left:10px;">
+                <button type="submit">Reject Cancellation</button>
+            </form>
+        {% endif %}
     </div>
-{% endfor %}
+{% endif %}
+{% else %}
+    <p>No orders found.</p>
+{% endif %}
 
 </body>
 </html>

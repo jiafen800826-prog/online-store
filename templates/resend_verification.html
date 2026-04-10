@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resend Verification</title>
+</head>
+<body>
+
+<h1>Resend Verification Email</h1>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+<form method="POST">
+    <input type="email" name="email" placeholder="Enter your email" required>
+    <button type="submit">Resend Verification</button>
+</form>
+
+</body>
+</html>
