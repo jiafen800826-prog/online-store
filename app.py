@@ -36,8 +36,16 @@ app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
 app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
 app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_USERNAME")
 
-mail = Mail(app)
-stripe.api_key = app.config["STRIPE_SECRET_KEY"]
+try:
+    mail = Mail(app)
+except Exception as e:
+    print("Mail init failed:", e)
+    mail = None
+
+if app.config["STRIPE_SECRET_KEY"]:
+    stripe.api_key = app.config["STRIPE_SECRET_KEY"]
+else:
+    print("Stripe key not set")
 
 db.init_app(app)
 migrate = Migrate(app, db)
