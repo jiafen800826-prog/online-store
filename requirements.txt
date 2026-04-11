@@ -6,3 +6,4 @@ Werkzeug==3.0.3
 stripe==8.6.0
 gunicorn==22.0.0
 email-validator==2.1.1
+psycopg2-binary==2.9.9
