@@ -10,11 +10,18 @@ from itsdangerous.exc import SignatureExpired, BadSignature
 from datetime import datetime
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+from sqlalchemy import text
+
 from models import db, Product, User, Review, CartItem, Order, OrderItem, WishlistItem, ProductImage
 
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "store.db")
+
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///" + os.path.join(basedir, "store.db")
+print("DB URI:", app.config["SQLALCHEMY_DATABASE_URI"])
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
 
@@ -30,7 +37,6 @@ app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
 app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_USERNAME")
 
 mail = Mail(app)
-
 stripe.api_key = app.config["STRIPE_SECRET_KEY"]
 
 db.init_app(app)
@@ -91,6 +97,14 @@ def index():
         product_ratings=product_ratings
     )
 
+
+@app.route("/db-check")
+def db_check():
+    try:
+        result = db.session.execute(text("SELECT 1")).scalar()
+        return f"Database connected successfully: {result}"
+    except Exception as e:
+        return f"Database connection failed: {str(e)}", 500
 
 @app.route("/register", methods=["GET", "POST"])
 def register():

@@ -6,10 +6,10 @@
 </head>
 <body>
 
-<!-- 🔔 Flash messages -->
+<!-- Flash messages -->
 {% with messages = get_flashed_messages() %}
     {% if messages %}
-        <ul>
+        <ul class="flash-messages">
             {% for message in messages %}
                 <li>{{ message }}</li>
             {% endfor %}
@@ -17,57 +17,56 @@
     {% endif %}
 {% endwith %}
 
-<!-- ---------------- HEADER ---------------- -->
-<header>
-    <h1>My Online Store</h1>
+<!-- Header -->
+<header class="main-header">
+    <div class="logo">MyStore</div>
 
-    <nav>
+    <nav class="main-nav">
         {% if current_user.is_authenticated %}
-            <span>Hello, {{ current_user.username }}!</span>
+            <span class="welcome-text">Hello, {{ current_user.username }}!</span>
+            <a href="{{ url_for('index') }}">Home</a>
             <a href="{{ url_for('cart') }}">Cart</a>
             <a href="{{ url_for('my_orders') }}">My Orders</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
             <a href="{{ url_for('wishlist') }}">Wishlist</a>
-            
+            <a href="{{ url_for('logout') }}">Logout</a>
 
             {% if current_user.is_admin %}
-                | <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
-                | <a href="{{ url_for('admin_products') }}">Products</a>
-                | <a href="{{ url_for('admin_orders') }}">Orders</a>
+                <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('admin_products') }}">Products</a>
+                <a href="{{ url_for('admin_orders') }}">Orders</a>
             {% endif %}
-
         {% else %}
-            <a href="{{ url_for('login') }}">Login</a> |
+            <a href="{{ url_for('login') }}">Login</a>
             <a href="{{ url_for('register') }}">Register</a>
         {% endif %}
     </nav>
 
-    <form method="GET" action="{{ url_for('index') }}">
+    <form method="GET" action="{{ url_for('index') }}" class="search-bar">
         <input type="text" name="search" placeholder="Search products...">
         <button type="submit">Search</button>
     </form>
 </header>
 
-<!-- ---------------- MAIN CONTENT ---------------- -->
-<div style="display:flex; gap:20px; max-width:1200px; margin:20px auto;">
+<!-- Main layout -->
+<div class="main-layout">
 
-    <!-- ---------- CATEGORY SIDEBAR ---------- -->
-    <div style="width:200px; padding:20px; background:#f4f4f4;">
+    <!-- Sidebar -->
+    <aside class="sidebar">
         <h3>Categories</h3>
-        <ul style="list-style:none; padding:0;">
+        <ul class="category-list">
             <li><a href="{{ url_for('index') }}">All</a></li>
             {% for cat in categories %}
                 <li><a href="{{ url_for('index', category=cat) }}">{{ cat }}</a></li>
             {% endfor %}
         </ul>
-    </div>
+    </aside>
 
-    <!-- ---------- MAIN AREA ---------- -->
-    <div style="flex:1;">
+    <!-- Main content -->
+    <main class="content-area">
 
-        <!-- ---------- FEATURED CAROUSEL ---------- -->
+        <!-- Featured carousel -->
         {% if products %}
-        <div class="carousel-container">
+        <section class="carousel-container">
             <div class="carousel-slide">
                 {% for featured in products[:5] %}
                 <div class="carousel-item">
@@ -77,7 +76,6 @@
                     {% endif %}
 
                     <div class="carousel-text">
-
                         {% if featured.is_featured %}
                             <span class="badge">FEATURED</span>
                         {% endif %}
@@ -97,7 +95,11 @@
 
                         {% if current_user.is_authenticated %}
                             <a href="{{ url_for('add_to_cart', product_id=featured.id) }}">
-                                <button>Add to Cart</button>
+                                <button type="button">Add to Cart</button>
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('login') }}">
+                                <button type="button">Login to Buy</button>
                             </a>
                         {% endif %}
                     </div>
@@ -105,81 +107,100 @@
                 {% endfor %}
             </div>
 
-            <button class="prev">&#10094;</button>
-            <button class="next">&#10095;</button>
-        </div>
+            <button class="prev" type="button">&#10094;</button>
+            <button class="next" type="button">&#10095;</button>
+        </section>
         {% endif %}
 
-        <!-- ---------- PRODUCT GRID ---------- -->
-        <h2>All Products</h2>
+        <!-- Product grid -->
+        <section>
+            <h2>All Products</h2>
 
-        <div class="product-grid">
-        {% for product in products %}
-            <div class="product-card">
+            <div class="product-grid">
+                {% for product in products %}
+                <div class="product-card">
 
-                {% if product.image_url %}
-                    <img src="{{ product.image_url }}" alt="{{ product.name }}">
-                {% endif %}
+                    <!-- IMAGE -->
+                    <div class="product-image">
+                        {% if product.image_url %}
+                            <img src="{{ product.image_url }}" alt="{{ product.name }}">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='uploads/default.png') }}" alt="{{ product.name }}">
+                        {% endif %}
+                    </div>
 
-                {% if product.is_featured %}
-                    <span class="badge-grid">FEATURED</span>
-                {% endif %}
+                    <!-- INFO -->
+                    <div class="product-info">
+                        {% if product.is_featured %}
+                            <span class="badge-grid">FEATURED</span>
+                        {% endif %}
 
-                <h3>{{ product.name }}</h3>
+                        <h3 class="product-title">{{ product.name }}</h3>
 
-                <!-- PRICE -->
-                {% if product.discount > 0 %}
-                    <p>
-                        <span class="old-price">${{ "%.2f"|format(product.price) }}</span>
-                        <span class="discounted-price">
-                            ${{ "%.2f"|format(product.price * (1 - product.discount/100)) }}
-                        </span>
-                    </p>
-                {% else %}
-                    <p>${{ "%.2f"|format(product.price) }}</p>
-                {% endif %}
+                        <!-- PRICE -->
+                        {% if product.discount > 0 %}
+                            <p class="product-price">
+                                <span class="old-price">${{ "%.2f"|format(product.price) }}</span>
+                                <span class="discounted-price">
+                                    ${{ "%.2f"|format(product.price * (1 - product.discount/100)) }}
+                                </span>
+                            </p>
+                        {% else %}
+                            <p class="product-price">${{ "%.2f"|format(product.price) }}</p>
+                        {% endif %}
 
-                <!-- ⭐ SAFE RATING -->
-                {% set rating = product_ratings.get(product.id, 0) %}
-                {% set avg = rating|round|int %}
-                <p>
-                    {% for i in range(avg) %}★{% endfor %}
-                    {% for i in range(5 - avg) %}☆{% endfor %}
-                </p>
+                        <!-- RATING -->
+                        {% set rating = product_ratings.get(product.id, 0) %}
+                        {% set avg = rating|round|int %}
+                        <p class="rating-stars">
+                            {% for i in range(avg) %}★{% endfor %}
+                            {% for i in range(5 - avg) %}☆{% endfor %}
+                        </p>
 
-                <!-- STOCK -->
-                {% if product.stock > 0 %}
-                    <p>Stock: {{ product.stock }}</p>
+                        <!-- STOCK -->
+                        {% if product.stock > 0 %}
+                            {% if product.stock < 5 %}
+                                <p class="low-stock">Only {{ product.stock }} left!</p>
+                            {% else %}
+                                <p>Stock: {{ product.stock }}</p>
+                            {% endif %}
 
-                    {% if product.stock < 5 %}
-                        <p style="color:red;">Only {{ product.stock }} left!</p>
-                    {% endif %}
+                            <div class="product-actions">
+                                {% if current_user.is_authenticated %}
+                                    <a href="{{ url_for('add_to_cart', product_id=product.id) }}">
+                                        <button type="button">Add to Cart</button>
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('login') }}">
+                                        <button type="button">Login</button>
+                                    </a>
+                                {% endif %}
 
-                    {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('add_to_cart', product_id=product.id) }}">
-                            <button>Add to Cart</button>
-                        </a>
-                    {% else %}
-                        <p>Login to add to cart</p>
-                    {% endif %}
+                                <a href="{{ url_for('product_detail', product_id=product.id) }}">
+                                    <button type="button" class="btn-secondary">View</button>
+                                </a>
+                            </div>
 
-                {% else %}
-                    <p style="color:red;">Out of Stock</p>
-                    <button disabled style="background-color: gray;">Out of Stock</button>
-                {% endif %}
+                        {% else %}
+                            <p class="out-of-stock-text">Out of Stock</p>
+                            <button type="button" disabled class="out-of-stock-btn">Out of Stock</button>
 
-                <a href="{{ url_for('product_detail', product_id=product.id) }}">
-                    View Details
-                </a>
-
+                            <div class="product-actions">
+                                <a href="{{ url_for('product_detail', product_id=product.id) }}">
+                                    <button type="button" class="btn-secondary">View</button>
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
             </div>
-        {% endfor %}
-        </div>
+        </section>
 
-    </div>
+    </main>
 </div>
 
-<!-- ---------------- CAROUSEL JS ---------------- -->
+<!-- Carousel JS -->
 <script>
 let slideIndex = 0;
 const slides = document.querySelectorAll('.carousel-item');
@@ -195,11 +216,13 @@ function showSlide(index) {
 }
 
 function nextSlide() {
+    if (totalSlides === 0) return;
     slideIndex = (slideIndex + 1) % totalSlides;
     showSlide(slideIndex);
 }
 
 function prevSlide() {
+    if (totalSlides === 0) return;
     slideIndex = (slideIndex - 1 + totalSlides) % totalSlides;
     showSlide(slideIndex);
 }
@@ -209,7 +232,9 @@ if (nextBtn && prevBtn) {
     prevBtn.addEventListener('click', prevSlide);
 }
 
-setInterval(nextSlide, 5000);
+if (totalSlides > 0) {
+    setInterval(nextSlide, 5000);
+}
 </script>
 
 </body>

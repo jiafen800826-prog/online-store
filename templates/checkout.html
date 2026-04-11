@@ -3,91 +3,63 @@
 <head>
     <title>Checkout</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-    <style>
-        .checkout-container {
-            display: flex;
-            gap: 40px;
-            padding: 20px;
-        }
-
-        .form-section, .summary-section {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            flex: 1;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .summary-section {
-            max-width: 400px;
-        }
-
-        input, select {
-            width: 100%;
-            margin-bottom: 10px;
-            padding: 8px;
-        }
-
-        button {
-            width: 100%;
-        }
-    </style>
 </head>
 <body>
 
-<h1 style="text-align:center;">🧾 Checkout</h1>
+<header class="main-header">
+    <div class="logo">MyStore</div>
+    <nav class="main-nav">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('cart') }}">Cart</a>
+        <a href="{{ url_for('my_orders') }}">My Orders</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+</header>
 
-{% if items %}
-<div class="checkout-container">
+<div class="checkout-page">
+    <div class="checkout-form-card">
+        <h1>Checkout</h1>
+        <p class="checkout-subtitle">Complete your order details below.</p>
 
-    <!-- ✅ LEFT: SHIPPING FORM -->
-    <div class="form-section">
-        <h2>Shipping Information</h2>
+        <form method="POST" action="{{ url_for('checkout') }}">
+            <label for="full_name">Full Name</label>
+            <input type="text" id="full_name" name="full_name" required>
 
-        <form method="POST">
-            <input type="text" name="full_name" placeholder="Full Name" required>
-            <input type="text" name="address" placeholder="Address" required>
-            <input type="text" name="city" placeholder="City" required>
-            <input type="text" name="zipcode" placeholder="ZIP Code" required>
-            <input type="text" name="phone" placeholder="Phone Number" required>
+            <label for="address">Address</label>
+            <input type="text" id="address" name="address" required>
 
-            <h3>Payment Method</h3>
+            <label for="city">City</label>
+            <input type="text" id="city" name="city" required>
 
-            <select name="payment_method" required>
-                <option value="stripe">Credit Card (Stripe)</option>
-                <option value="cod">Cash on Delivery</option>
-            </select>
+            <label for="zipcode">Zip Code</label>
+            <input type="text" id="zipcode" name="zipcode" required>
 
-            <button type="submit">Place Order</button>
+            <button type="submit" class="checkout-btn">Continue to Payment</button>
         </form>
     </div>
 
-    <!-- ✅ RIGHT: ORDER SUMMARY -->
-    <div class="summary-section">
+    <div class="checkout-summary-card">
         <h2>Order Summary</h2>
 
-        <ul>
-        {% for item in items %}
-            <li>
-                {{ item.product.name }} × {{ item.quantity }}
-            </li>
-        {% endfor %}
-        </ul>
+        {% if cart_items %}
+            <ul class="checkout-items">
+                {% for item in cart_items %}
+                    <li>
+                        <span>{{ item.product.name }} × {{ item.quantity }}</span>
+                        <strong>${{ "%.2f"|format(item.product.price * item.quantity) }}</strong>
+                    </li>
+                {% endfor %}
+            </ul>
 
-        <p>Subtotal: ${{ "%.2f"|format(subtotal) }}</p>
-        <p>Shipping: ${{ "%.2f"|format(shipping) }}</p>
-
-        <hr>
-
-        <h3>Total: ${{ "%.2f"|format(total) }}</h3>
+            <div class="checkout-total">
+                <span>Total</span>
+                <strong>${{ "%.2f"|format(total) }}</strong>
+            </div>
+        {% else %}
+            <p>Your cart is empty.</p>
+        {% endif %}
     </div>
-
 </div>
-
-{% else %}
-    <p style="text-align:center;">Your cart is empty.</p>
-{% endif %}
 
 </body>
 </html>
